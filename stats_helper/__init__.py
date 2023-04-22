@@ -44,23 +44,18 @@ def refresh_uuid_list(server: ServerInterface):
 	if os.path.isfile(constants.UUIDFile):
 		with open(constants.UUIDFile, 'r') as file:
 			uuid_file.update(json.load(file))
-	uuid_cache_time = {}
 	file_name = os.path.join(config.server_path, 'usercache.json')
 	if os.path.isfile(file_name):
 		with codecs.open(file_name, encoding='utf8') as f:
 			try:
 				for item in json.load(f):
 					player, uuid = item['name'], item['uuid']
-					expired_time = time.strptime(item['expiresOn'].rsplit(' ', 1)[0], '%Y-%m-%d %X')
-					if player in uuid_cache:
-						flag = expired_time > uuid_cache_time[player]
-					else:
-						flag = True
-					if flag:
-						uuid_cache[player] = uuid
-						uuid_cache_time[player] = expired_time
+					uuid_cache[player] = uuid
 			except ValueError:
 				pass
+	for player in set(uuid_file.keys()):
+		if player not in uuid_cache and uuid_file[player] in uuid_cache.values():
+			uuid_file.pop(player)
 	uuid_list.update(uuid_file)
 	uuid_list.update(uuid_cache)
 	save_uuid_list()
