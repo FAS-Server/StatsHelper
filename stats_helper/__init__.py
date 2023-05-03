@@ -56,6 +56,10 @@ def refresh_uuid_list(server: ServerInterface):
 	for player in set(uuid_file.keys()):
 		if player not in uuid_cache and uuid_file[player] in uuid_cache.values():
 			uuid_file.pop(player)
+			try:
+				uuid_list.pop(player)
+			except KeyError:
+				pass
 	uuid_list.update(uuid_file)
 	uuid_list.update(uuid_cache)
 	save_uuid_list()
